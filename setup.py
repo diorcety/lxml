@@ -30,6 +30,9 @@ STATIC_LIBRARY_DIRS = []
 STATIC_CFLAGS = []
 STATIC_BINARIES = []
 
+if os.name != 'nt':
+    STATIC_CFLAGS.append('-fPIC')
+
 # create lxml-version.h file
 versioninfo.create_version_h()
 lxml_version = versioninfo.version()
