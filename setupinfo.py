@@ -276,7 +276,9 @@ def libraries():
     standard_libs.append('m')
 
     if sys.platform in ('win32',):
-        libs = ['libxslt', 'libexslt', 'libxml2', 'iconv']
+        libs = ['libxslt', 'libexslt', 'libxml2']
+        if not OPTION_WITHOUT_ICONV:
+            libs.append('iconv')
         if OPTION_STATIC:
             libs = ['%s_a' % lib for lib in libs]
         libs.extend(['zlib', 'WS2_32'])
@@ -491,6 +493,7 @@ staticbuild = bool(os.environ.get('STATICBUILD', ''))
 OPTION_WITHOUT_OBJECTIFY = has_option('without-objectify')
 OPTION_WITH_UNICODE_STRINGS = has_option('with-unicode-strings')
 OPTION_WITHOUT_ASSERT = has_option('without-assert')
+OPTION_WITHOUT_ICONV = has_option('without-iconv')
 OPTION_WITHOUT_THREADING = has_option('without-threading')
 OPTION_WITHOUT_CYTHON = has_option('without-cython')
 OPTION_WITH_CYTHON = has_option('with-cython')
