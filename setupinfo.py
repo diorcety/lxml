@@ -248,7 +248,9 @@ def extra_setup_args():
 
 def seems_to_have_libxml2():
     from distutils import ccompiler
+    from distutils.sysconfig import customize_compiler
     compiler = ccompiler.new_compiler()
+    customize_compiler(compiler)
     return compiler.has_function(
         'xmlXPathInit',
         include_dirs=include_dirs([]) + ['/usr/include/libxml2'],
