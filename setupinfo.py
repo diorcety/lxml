@@ -294,6 +294,8 @@ def library_dirs(static_library_dirs):
         return static_library_dirs
     # filter them from xslt-config --libs
     result = []
+    if OPTION_PREFIX:
+        result.append(os.path.join(OPTION_PREFIX, 'lib'))
     possible_library_dirs = flags('libs')
     for possible_library_dir in possible_library_dirs:
         if possible_library_dir.startswith('-L'):
@@ -307,6 +309,9 @@ def include_dirs(static_include_dirs):
         return static_include_dirs
     # filter them from xslt-config --cflags
     result = []
+    if OPTION_PREFIX:
+        result.append(os.path.join(OPTION_PREFIX, 'include', 'libxml2'))
+        result.append(os.path.join(OPTION_PREFIX, 'include'))
     possible_include_dirs = flags('cflags')
     for possible_include_dir in possible_include_dirs:
         if possible_include_dir.startswith('-I'):
@@ -448,10 +453,13 @@ def find_xslt_config():
 
 ## Option handling:
 
-def has_option(name):
+def has_option(name, remove=True):
     try:
-        sys.argv.remove('--%s' % name)
-        return True
+        if remove:
+            sys.argv.remove('--%s' % name)
+            return True
+        else:
+            return '--%s' % name in sys.argv
     except ValueError:
         pass
     # allow passing all cmd line options also as environment variables
@@ -460,18 +468,20 @@ def has_option(name):
         return True
     return False
 
-def option_value(name):
+def option_value(name, remove=True):
     for index, option in enumerate(sys.argv):
         if option == '--' + name:
             if index+1 >= len(sys.argv):
                 raise DistutilsOptionError(
                     'The option %s requires a value' % option)
             value = sys.argv[index+1]
-            sys.argv[index:index+2] = []
+            if remove:
+                sys.argv[index:index+2] = []
             return value
         if option.startswith('--' + name + '='):
             value = option[len(name)+3:]
-            sys.argv[index:index+1] = []
+            if remove:
+                sys.argv[index:index+1] = []
             return value
     env_val = os.getenv(name.upper().replace('-', '_'))
     return env_val
@@ -491,6 +501,7 @@ OPTION_WITH_CLINES = has_option('with-clines')
 if OPTION_WITHOUT_CYTHON:
     CYTHON_INSTALLED = False
 OPTION_STATIC = staticbuild or has_option('static')
+OPTION_PREFIX = option_value('prefix', False)
 OPTION_DEBUG_GCC = has_option('debug-gcc')
 OPTION_SHOW_WARNINGS = has_option('warnings')
 OPTION_AUTO_RPATH = has_option('auto-rpath')
