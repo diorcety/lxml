@@ -2,9 +2,13 @@ import sys
 import io
 import os
 import os.path
-from distutils.core import Extension
 from distutils.errors import CompileError, DistutilsOptionError
-from distutils.command.build_ext import build_ext as _build_ext
+try:
+    from setuptools import Extension
+    from setuptools.command.build_ext import build_ext as _build_ext
+except ImportError:
+    from distutils.core import Extension
+    from distutils.command.build_ext import build_ext as _build_ext
 from versioninfo import get_base_dir
 
 try:
